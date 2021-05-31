@@ -19,5 +19,4 @@ Simply download the latest [release](https://github.com/ratoobi/tibia-party-sess
 2. The total sum to be transfered to each player will be displayed
 	1. Either use the "Copy" button or select and copy manually
 
-![example](https://s3.gifyu.com/images/example8bda8e862377bcdf.md.gif)
-
+![example](https://user-images.githubusercontent.com/69602231/120229537-bae2c600-c223-11eb-94ae-7e1841fb630e.gif)
