@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QWidget,
     QVBoxLayout,
-    QHBoxLayout,
     QApplication,
     QTabWidget,
 )
@@ -22,8 +21,6 @@ class SessionsMerger(QWidget):
         self.raw_sessions_textbox = None
         self.tibiapal_logs_textbox = None
         self.format_button = None
-        self.copy_button = None
-        self.paste_button = None
 
         self.setWindowTitle("Party Sessions Merger")
         self.setWindowIcon(QIcon(self.iconName))
@@ -41,7 +38,6 @@ class SessionsMerger(QWidget):
 
         outer_layout = QVBoxLayout()
         buttons_layout = QVBoxLayout()
-        bottom_buttons_layout = QHBoxLayout()
 
         self.raw_sessions_textbox = QPlainTextEdit(self)
         outer_layout.addWidget(self.raw_sessions_textbox)
@@ -51,17 +47,6 @@ class SessionsMerger(QWidget):
         self.format_button.clicked.connect(self.merge_button_handler)
         buttons_layout.addWidget(self.format_button)
 
-        self.paste_button = QPushButton(self)
-        self.paste_button.setText("Paste")
-        self.paste_button.clicked.connect(self.paste_button_handler)
-        bottom_buttons_layout.addWidget(self.paste_button)
-
-        self.copy_button = QPushButton(self)
-        self.copy_button.setText("Copy")
-        self.copy_button.clicked.connect(self.copy_button_handler)
-        bottom_buttons_layout.addWidget(self.copy_button)
-
-        buttons_layout.addLayout(bottom_buttons_layout)
         outer_layout.addLayout(buttons_layout)
         self.setLayout(outer_layout)
         raw_sessions_tab.setLayout(outer_layout)
@@ -73,7 +58,6 @@ class SessionsMerger(QWidget):
 
         outer_layout = QVBoxLayout()
         buttons_layout = QVBoxLayout()
-        bottom_buttons_layout = QHBoxLayout()
 
         self.tibiapal_logs_textbox = QPlainTextEdit(self)
         outer_layout.addWidget(self.tibiapal_logs_textbox)
@@ -83,17 +67,6 @@ class SessionsMerger(QWidget):
         self.format_button.clicked.connect(self.tibiapal_merge_button_handler)
         buttons_layout.addWidget(self.format_button)
 
-        self.paste_button = QPushButton(self)
-        self.paste_button.setText("Paste")
-        self.paste_button.clicked.connect(self.paste_button_handler)
-        bottom_buttons_layout.addWidget(self.paste_button)
-
-        self.copy_button = QPushButton(self)
-        self.copy_button.setText("Copy")
-        self.copy_button.clicked.connect(self.copy_button_handler)
-        bottom_buttons_layout.addWidget(self.copy_button)
-
-        buttons_layout.addLayout(bottom_buttons_layout)
         outer_layout.addLayout(buttons_layout)
         self.setLayout(outer_layout)
         tibiapal_logs_tab.setLayout(outer_layout)
@@ -109,13 +82,6 @@ class SessionsMerger(QWidget):
         input_text = self.tibiapal_logs_textbox.toPlainText()
         output_text = format_tibiapal_party_log(input_text)
         self.tibiapal_logs_textbox.setPlainText(output_text)
-
-    def paste_button_handler(self):
-        self.raw_sessions_textbox.paste()
-
-    def copy_button_handler(self):
-        self.raw_sessions_textbox.selectAll()
-        self.raw_sessions_textbox.copy()
 
 
 if __name__ == "__main__":
