@@ -7,20 +7,20 @@ class Session:
         self.payroll = {}
 
 
-def format_raw_party_session_data(list_text):
+def format_raw_party_session_data(session_data):
     session = Session([], [], 0, 0)
 
-    for current_line in range(len(list_text)):
-        if ":" not in list_text[current_line] and len(list_text[current_line]) > 0:
+    for current_line in range(len(session_data)):
+        if ":" not in session_data[current_line] and len(session_data[current_line]) > 0:
             can_remove_commas = True
             session.party_size += 1
-            player_name = list_text[current_line]
+            player_name = session_data[current_line]
             if "(" in player_name:
                 bracket_index = player_name.index("(")
                 player_name = player_name[:bracket_index - 1]
             session.players.append(player_name)
 
-            player_balance = list_text[current_line + 3]
+            player_balance = session_data[current_line + 3]
             colon_index = player_balance.index(":")
             player_balance = player_balance[colon_index + 2] + player_balance[colon_index + 3:]
             while can_remove_commas:

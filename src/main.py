@@ -1,5 +1,5 @@
 import sys
-from tibiapal_formatter import format_tibiapal_party_log
+from tibiapal_logs_merger import merge_tibiapal_lootsplit_logs
 from raw_session_merger import merge_raw_session_logs
 from PyQt5.QtGui import QIcon, QPalette, QColor
 from PyQt5.QtCore import QSize, Qt
@@ -20,7 +20,7 @@ class SessionsMerger(QWidget):
         self.iconName = "../img/icon.ico"
         self.raw_sessions_textbox = None
         self.tibiapal_logs_textbox = None
-        self.format_button = None
+        self.merge_button = None
 
         self.setWindowTitle("Party Sessions Merger")
         self.setWindowIcon(QIcon(self.iconName))
@@ -42,10 +42,10 @@ class SessionsMerger(QWidget):
         self.raw_sessions_textbox = QPlainTextEdit(self)
         outer_layout.addWidget(self.raw_sessions_textbox)
 
-        self.format_button = QPushButton(self)
-        self.format_button.setText("Merge")
-        self.format_button.clicked.connect(self.merge_button_handler)
-        buttons_layout.addWidget(self.format_button)
+        self.merge_button = QPushButton(self)
+        self.merge_button.setText("Merge")
+        self.merge_button.clicked.connect(self.merge_button_handler)
+        buttons_layout.addWidget(self.merge_button)
 
         outer_layout.addLayout(buttons_layout)
         self.setLayout(outer_layout)
@@ -62,10 +62,10 @@ class SessionsMerger(QWidget):
         self.tibiapal_logs_textbox = QPlainTextEdit(self)
         outer_layout.addWidget(self.tibiapal_logs_textbox)
 
-        self.format_button = QPushButton(self)
-        self.format_button.setText("Merge")
-        self.format_button.clicked.connect(self.tibiapal_merge_button_handler)
-        buttons_layout.addWidget(self.format_button)
+        self.merge_button = QPushButton(self)
+        self.merge_button.setText("Merge")
+        self.merge_button.clicked.connect(self.tibiapal_merge_button_handler)
+        buttons_layout.addWidget(self.merge_button)
 
         outer_layout.addLayout(buttons_layout)
         self.setLayout(outer_layout)
@@ -80,7 +80,7 @@ class SessionsMerger(QWidget):
 
     def tibiapal_merge_button_handler(self):
         input_text = self.tibiapal_logs_textbox.toPlainText()
-        output_text = format_tibiapal_party_log(input_text)
+        output_text = merge_tibiapal_lootsplit_logs(input_text)
         self.tibiapal_logs_textbox.setPlainText(output_text)
 
 
@@ -102,6 +102,6 @@ if __name__ == "__main__":
     palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
     palette.setColor(QPalette.HighlightedText, Qt.black)
     app.setPalette(palette)
-    mainWin = SessionsMerger()
-    mainWin.show()
+    window = SessionsMerger()
+    window.show()
     sys.exit(app.exec_())
