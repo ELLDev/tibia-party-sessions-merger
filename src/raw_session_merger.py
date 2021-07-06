@@ -116,7 +116,7 @@ def merge_raw_session_logs(input_data):
     for i in range(len(party_sessions_index) - 1):
         start = party_sessions_index[i]
         end = party_sessions_index[i + 1]
-        session_instances.append(format_raw_party_session_data(sessions[start:end - 1]))
+        session_instances.append(format_raw_party_session_data(sessions[start:end]))
 
     for session in session_instances:
         session.payroll = split_loot(session)
