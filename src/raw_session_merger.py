@@ -11,10 +11,20 @@ def format_raw_party_session_data(session_data):
     session = Session([], [], 0, 0)
 
     for current_line in range(len(session_data)):
-        if ":" not in session_data[current_line] and len(session_data[current_line]) > 0:
+        if ":" not in session_data[current_line] \
+                and len(session_data[current_line]) > 0 and session_data[current_line].isspace() is False:
             can_remove_commas = True
             session.party_size += 1
             player_name = session_data[current_line]
+            if player_name[0].isspace():
+                whitespace_length = 0
+                for c in player_name:
+                    if c.isspace():
+                        whitespace_length += 1
+                    else:
+                        break
+                player_name = player_name[whitespace_length:]
+
             if "(" in player_name:
                 bracket_index = player_name.index("(")
                 player_name = player_name[:bracket_index - 1]
