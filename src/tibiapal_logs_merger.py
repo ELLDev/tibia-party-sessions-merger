@@ -30,9 +30,18 @@ def merge_tibiapal_lootsplit_logs(input_data):
         tmp_list.append(debt)
         players_balance.append((tmp_list, debt_player_name))
 
+    players_balance = sorted(players_balance, key=lambda x: x[0][1], reverse=True)
     payroll = {key: [] for key in debt_players}
     for t in players_balance:
-        payroll[t[1]].append(t[0])
+        if len(payroll[t[1]]) == 0:
+            payroll[t[1]].append(t[0])
+        else:
+            for debt in range(len(payroll[t[1]])):
+                if payroll[t[1]][debt][0] == t[0][0]:
+                    payroll[t[1]][debt][1] += t[0][1]
+                    break
+                if debt == len(payroll[t[1]]) - 1:
+                    payroll[t[1]].append(t[0])
 
     for debt in payroll:
         output += (debt + ":" + "\n")
