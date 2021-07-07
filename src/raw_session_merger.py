@@ -7,44 +7,59 @@ class Session:
         self.payroll = {}
 
 
+def format_player_name(name):
+    if name[0].isspace():
+        whitespace_length = 0
+        for c in name:
+            if c.isspace():
+                whitespace_length += 1
+            else:
+                break
+        name = name[whitespace_length:]
+
+    if "(" in name:
+        bracket_index = name.index("(")
+        name = name[:bracket_index - 1]
+
+    return name
+
+
+def format_number(number):
+    can_remove_commas = True
+    colon_index = number.index(":")
+    number = number[colon_index + 2] + number[colon_index + 3:]
+
+    while can_remove_commas:
+        try:
+            comma_index = number.index(",")
+            number = number[:comma_index] + number[comma_index + 1:]
+        except ValueError:
+            can_remove_commas = False
+
+    number = int(number)
+    number = int(number / 100) * 100
+
+    return number
+
+
 def format_raw_party_session_data(session_data):
     session = Session([], [], 0, 0)
+    total_supplies = format_number(session_data[4])
 
     for current_line in range(len(session_data)):
         if ":" not in session_data[current_line] \
                 and len(session_data[current_line]) > 0 and session_data[current_line].isspace() is False:
-            can_remove_commas = True
             session.party_size += 1
-            player_name = session_data[current_line]
-            if player_name[0].isspace():
-                whitespace_length = 0
-                for c in player_name:
-                    if c.isspace():
-                        whitespace_length += 1
-                    else:
-                        break
-                player_name = player_name[whitespace_length:]
+            player_name = format_player_name(session_data[current_line])
+            player_balance = format_number(session_data[current_line + 3])
+            player_supplies = format_number(session_data[current_line + 2])
 
-            if "(" in player_name:
-                bracket_index = player_name.index("(")
-                player_name = player_name[:bracket_index - 1]
-            session.players.append(player_name)
-
-            player_balance = session_data[current_line + 3]
-            colon_index = player_balance.index(":")
-            player_balance = player_balance[colon_index + 2] + player_balance[colon_index + 3:]
-            while can_remove_commas:
-                try:
-                    comma_index = player_balance.index(",")
-                    player_balance = player_balance[:comma_index] + player_balance[comma_index + 1:]
-                except ValueError:
-                    can_remove_commas = False
-
-            player_balance = int(player_balance)
-            player_balance = int(player_balance / 100) * 100
+            total_supplies -= player_supplies
             session.total_balance += player_balance
+            session.players.append(player_name)
             session.players_balance.append((player_name, player_balance))
-
+            if total_supplies <= (session.party_size - 1) * 100:
+                break
     return session
 
 
@@ -109,14 +124,14 @@ def merge_raw_session_logs(input_data):
 
     sessions = list(input_data.split("\n"))
     for current_line in range(len(sessions)):
-        if "Session data:" in sessions[current_line]:
+        if "Session:" in sessions[current_line]:
             party_sessions_index.append(current_line)
     party_sessions_index.append(len(sessions))  # add "end" index for the last session
 
     for i in range(len(party_sessions_index) - 1):
         start = party_sessions_index[i]
         end = party_sessions_index[i + 1]
-        session_instances.append(format_raw_party_session_data(sessions[start:end]))
+        session_instances.append(format_raw_party_session_data(sessions[start - 1:end]))
 
     for session in session_instances:
         session.payroll = split_loot(session)

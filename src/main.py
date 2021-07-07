@@ -75,8 +75,12 @@ class SessionsMerger(QWidget):
 
     def merge_button_handler(self):
         input_text = self.raw_sessions_textbox.toPlainText()
-        output_text = merge_raw_session_logs(input_text)
-        self.raw_sessions_textbox.setPlainText(output_text)
+        try:
+            output_text = merge_raw_session_logs(input_text)
+            self.raw_sessions_textbox.setPlainText(output_text)
+        except:
+            error = "At least one session is unsuitable. \n\nPlease review the input file."
+            self.raw_sessions_textbox.setPlainText(error)
 
     def tibiapal_merge_button_handler(self):
         input_text = self.tibiapal_logs_textbox.toPlainText()
