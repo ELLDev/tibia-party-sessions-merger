@@ -25,12 +25,13 @@ class SessionsMerger(QWidget):
         self.setWindowTitle("Party Sessions Merger")
         self.setWindowIcon(QIcon(self.iconName))
         self.setMinimumSize(QSize(880, 680))
+        self.setAcceptDrops(True)
 
         layout = QVBoxLayout()
-        tabs = QTabWidget()
-        tabs.addTab(self.raw_sessions_tab_ui(), "Raw Party Sessions")
-        tabs.addTab(self.tibiapal_logs_tab_ui(), "TibiaPal LootSplit Logs")
-        layout.addWidget(tabs)
+        self.tabs = QTabWidget()
+        self.tabs.addTab(self.raw_sessions_tab_ui(), "Raw Party Sessions")
+        self.tabs.addTab(self.tibiapal_logs_tab_ui(), "TibiaPal LootSplit Logs")
+        layout.addWidget(self.tabs)
         self.setLayout(layout)
 
     def raw_sessions_tab_ui(self):
@@ -40,6 +41,7 @@ class SessionsMerger(QWidget):
         buttons_layout = QVBoxLayout()
 
         self.raw_sessions_textbox = QPlainTextEdit(self)
+        self.raw_sessions_textbox.setAcceptDrops(False)
         outer_layout.addWidget(self.raw_sessions_textbox)
 
         self.merge_button = QPushButton(self)
@@ -60,11 +62,12 @@ class SessionsMerger(QWidget):
         buttons_layout = QVBoxLayout()
 
         self.tibiapal_logs_textbox = QPlainTextEdit(self)
+        self.tibiapal_logs_textbox.setAcceptDrops(False)
         outer_layout.addWidget(self.tibiapal_logs_textbox)
 
         self.merge_button = QPushButton(self)
         self.merge_button.setText("Merge")
-        self.merge_button.clicked.connect(self.tibiapal_merge_button_handler)
+        self.merge_button.clicked.connect(self.merge_button_handler)
         buttons_layout.addWidget(self.merge_button)
 
         outer_layout.addLayout(buttons_layout)
@@ -74,18 +77,45 @@ class SessionsMerger(QWidget):
         return tibiapal_logs_tab
 
     def merge_button_handler(self):
-        input_text = self.raw_sessions_textbox.toPlainText()
-        try:
-            output_text = merge_raw_session_logs(input_text)
-            self.raw_sessions_textbox.setPlainText(output_text)
-        except:
-            error = "At least one session is unsuitable. \n\nPlease review the input file."
-            self.raw_sessions_textbox.setPlainText(error)
+        if self.tabs.currentIndex() == 0:
+            input_text = self.raw_sessions_textbox.toPlainText()
+            try:
+                output_text = merge_raw_session_logs(input_text)
+                self.raw_sessions_textbox.setPlainText(output_text)
+            except:
+                error = "At least one session is unsuitable. \n\nPlease review the input file."
+                self.raw_sessions_textbox.setPlainText(error)
+        else:
+            input_text = self.tibiapal_logs_textbox.toPlainText()
+            output_text = merge_tibiapal_lootsplit_logs(input_text)
+            self.tibiapal_logs_textbox.setPlainText(output_text)
 
-    def tibiapal_merge_button_handler(self):
-        input_text = self.tibiapal_logs_textbox.toPlainText()
-        output_text = merge_tibiapal_lootsplit_logs(input_text)
-        self.tibiapal_logs_textbox.setPlainText(output_text)
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasText:
+            try:
+                open(event.mimeData().urls()[0].toLocalFile()).read()
+                event.accept()
+            except:
+                event.ignore()
+        else:
+            event.ignore()
+
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasText:
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        if event.mimeData().hasText:
+            file_path = event.mimeData().urls()[0].toLocalFile()
+            if self.tabs.currentIndex() == 0:
+                self.raw_sessions_textbox.setPlainText(open(file_path).read())
+            else:
+                self.tibiapal_logs_textbox.setPlainText(open(file_path).read())
+            event.accept()
+        else:
+            event.ignore()
 
 
 if __name__ == "__main__":
