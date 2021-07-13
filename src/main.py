@@ -1,4 +1,5 @@
 import sys
+import os
 from tibiapal_logs_merger import merge_tibiapal_lootsplit_logs
 from raw_session_merger import merge_raw_session_logs
 from PyQt5.QtGui import QIcon, QPalette, QColor
@@ -21,6 +22,11 @@ class SessionsMerger(QWidget):
         self.raw_sessions_textbox = None
         self.tibiapal_logs_textbox = None
         self.merge_button = None
+
+        if hasattr(sys, '_MEIPASS'):
+            self.iconName = os.path.join(sys._MEIPASS, self.iconName)
+        else:
+            self.iconName = os.path.join(os.path.abspath('.'), self.iconName)
 
         self.setWindowTitle("Party Sessions Merger")
         self.setWindowIcon(QIcon(self.iconName))
