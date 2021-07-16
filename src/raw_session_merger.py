@@ -24,11 +24,10 @@ def format_player_name(name):
     return name
 
 
-def format_number(number):
+def format_number(number, offset=0):
     can_remove_commas = True
-    colon_index = number.index(":")
-    number = number[colon_index + 2] + number[colon_index + 3:]
-
+    trim_index = number.index("e")
+    number = number[trim_index + 2 + offset:]
     while can_remove_commas:
         try:
             comma_index = number.index(",")
@@ -44,22 +43,20 @@ def format_number(number):
 
 def format_raw_party_session_data(session_data):
     session = Session([], [], 0, 0)
-    total_supplies = format_number(session_data[4])
+    total_supplies = format_number(session_data[4], 1)
 
-    for current_line in range(len(session_data)):
-        if ":" not in session_data[current_line] \
-                and len(session_data[current_line]) > 0 and session_data[current_line].isspace() is False:
-            session.party_size += 1
-            player_name = format_player_name(session_data[current_line])
-            player_balance = format_number(session_data[current_line + 3])
-            player_supplies = format_number(session_data[current_line + 2])
+    for current_line in range(6, len(session_data), 6):
+        session.party_size += 1
+        player_name = format_player_name(session_data[current_line])
+        player_balance = format_number(session_data[current_line + 3])
+        player_supplies = format_number(session_data[current_line + 2], 1)
 
-            total_supplies -= player_supplies
-            session.total_balance += player_balance
-            session.players.append(player_name)
-            session.players_balance.append((player_name, player_balance))
-            if total_supplies <= (session.party_size - 1) * 100:
-                break
+        total_supplies -= player_supplies
+        session.total_balance += player_balance
+        session.players.append(player_name)
+        session.players_balance.append((player_name, player_balance))
+        if total_supplies <= (session.party_size - 1) * 100:
+            break
     return session
 
 
@@ -124,14 +121,14 @@ def merge_raw_session_logs(input_data):
 
     sessions = list(input_data.split("\n"))
     for current_line in range(len(sessions)):
-        if "Session:" in sessions[current_line]:
+        if "Session data" in sessions[current_line]:
             party_sessions_index.append(current_line)
     party_sessions_index.append(len(sessions))  # add "end" index for the last session
 
     for i in range(len(party_sessions_index) - 1):
         start = party_sessions_index[i]
         end = party_sessions_index[i + 1]
-        session_instances.append(format_raw_party_session_data(sessions[start - 1:end]))
+        session_instances.append(format_raw_party_session_data(sessions[start:end]))
 
     for session in session_instances:
         session.payroll = split_loot(session)
